@@ -1,4 +1,4 @@
-FROM apache/flink:1.18.1-scala_2.12-python3
+FROM apache/flink:1.18.1-scala_2.12-java11
 
 WORKDIR /opt/flink/usrcode
 
