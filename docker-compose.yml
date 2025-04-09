@@ -59,22 +59,22 @@ services:
       - KAFKA_BROKER=kafka:9092
       - IMPRESSION_TOPIC=ad-impressions
       - CLICK_TOPIC=ad-clicks
-      - EVENT_RATE=50  # Events per second
-      - CLICK_RATIO=0.1 # 10% of impressions get clicks
+      - EVENT_RATE=50
+      - CLICK_RATIO=0.1
     networks:
       - flink-network
 
   # Flink JobManager
   flink-jobmanager:
-    image: apache/flink:1.18.1-scala_2.12-python3 # Asegúrate de usar la versión con Python
+    build:
+      context: ./flink-py
+      dockerfile: Dockerfile
     container_name: flink-jobmanager
     ports:
-      - "8081:8081" # Interfaz web de Flink
+      - "8081:8081"
     command: ["jobmanager"]
     environment:
-      # --- CORREGIDO ---
       - FLINK_PROPERTIES=jobmanager.rpc.address=flink-jobmanager
-      # --- FIN CORRECCIÓN ---
     depends_on:
       - kafka-setup
     networks:
@@ -82,13 +82,13 @@ services:
 
   # Flink TaskManager
   flink-taskmanager:
-    image: apache/flink:1.18.1-scala_2.12-python3 # Debe coincidir con la versión del JobManager
+    build:
+      context: ./flink-py
+      dockerfile: Dockerfile
     container_name: flink-taskmanager
     command: ["taskmanager"]
     environment:
-      # --- CORREGIDO ---
       - FLINK_PROPERTIES=jobmanager.rpc.address=flink-jobmanager
-      # --- FIN CORRECCIÓN ---
     depends_on:
       - flink-jobmanager
     networks:
@@ -97,7 +97,7 @@ services:
   # Flink Job
   flink-job:
     build:
-      context: ./flink-job # Directorio con tu Dockerfile del job
+      context: ./flink-job
       dockerfile: Dockerfile
     container_name: flink-job
     depends_on:
